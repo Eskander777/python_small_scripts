@@ -6,7 +6,8 @@ def get_data():
     '''Get all neccesary information from web. And puts it in an list'''
     response = requests.get(
         'http://autodr.ru/autospravka/559-avtomobilnye-kody-regionov-rossii.html')
-    response_array = html2text.html2text(response.text).splitlines()
+    response_content = response.content.decode(response.apparent_encoding)
+    response_array = html2text.html2text(response_content).splitlines()
     shortened_array = response_array[response_array.index(
         'Республика Адыгея | **01**  '):response_array.index('Выше приведен список кодов регионов, из которого можно узнать: - автокоды') - 1]
     codes_and_regions = []

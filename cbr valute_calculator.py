@@ -20,36 +20,36 @@ def get_cbr_info():
 def user_interface_data(cur_names, currencies_list):
     """Takes information from user and prepares everything"""
     print('-' * 45)
-    while True:
-        cur_to_pick = int(input('Выберите валюту по номеру в таблице: > '))
-        try:
-            cur_picked = cur_names[cur_to_pick - 1]
-        except Exception:
-            print('Такой валюты в списке нет! Попробуйте еще раз.')
-            print()
-            continue
+    cur_to_pick = input('Выберите валюту по номеру в таблице: > ')
+    if cur_to_pick == '':
+        return cur_to_pick, 0, 0, 0, 0
+    else:
+        cur_to_pick = int(cur_to_pick)
+        cur_picked = cur_names[cur_to_pick - 1]
+        cur_picked_list = cur_picked.split()
+        num_cur_picked_from_list = Decimal(cur_picked_list.pop(0))
+        name_cur_picked = ' '.join(cur_picked_list)
+        print()
+        cur_picked_value = 0
+        for val in currencies_list:
+            if val['Nominal'] + ' ' + val['Name'] == cur_picked:
+                cur_picked_value = Decimal(val['Value'].replace(',', '.'))
+
+        cur_operation = input(f"""Вы хотели бы узнать отношение: 
+        1.Валюта {name_cur_picked} к рублю
+        2 Рубля к валюте {name_cur_picked}
+        >  """)
+        if cur_operation == '1' or cur_operation == '2':
+            cur_amount = Decimal(
+                input(f'Введите количество единиц выбранной валюты: ').replace(',', '.'))
+            return name_cur_picked, cur_operation, cur_amount, cur_picked_value, num_cur_picked_from_list
         else:
-            print()
-            cur_picked_value = 0
-            for val in currencies_list:
-                if val['Nominal'] + ' ' + val['Name'] == cur_picked:
-                    cur_picked_value = Decimal(val['Value'].replace(',', '.'))
-
-            cur_operation = input("""Вы хотели бы узнать отношение: 
-            1.Выбранной валюты к рублу
-            2 Рубля к выбранной валюте
-            >  """)
-            cur_amount = Decimal(input('Введите количество единиц валюты: ').replace(',', '.'))
-            return cur_picked, cur_operation, cur_amount, cur_picked_value
+            raise ValueError
 
 
-def represents_results(cur_picked, cur_operation,
-                       cur_amount, cur_picked_value):
+def represents_results(name_cur_picked, cur_operation,
+                       cur_amount, cur_picked_value, num_cur_picked_from_list):
     """Represents results"""
-    cur_picked_list = cur_picked.split()
-    num_cur_picked_from_list = Decimal(cur_picked_list.pop(0))
-    name_cur_picked = ' '.join(cur_picked_list)
-
     if cur_operation == '1':
         if num_cur_picked_from_list != 1:
             cur_amount /= num_cur_picked_from_list
@@ -65,13 +65,19 @@ def represents_results(cur_picked, cur_operation,
 
 def main():
     cur_names, currencies_list = get_cbr_info()
-    try:
-        cur_picked, cur_operation, cur_amount, cur_picked_value \
-            = user_interface_data(cur_names, currencies_list)
-    except Exception:
-        pass
-    else:
-        represents_results(cur_picked, cur_operation, cur_amount, cur_picked_value)
+    while True:
+        try:
+            name_cur_picked, cur_operation, cur_amount, cur_picked_value, num_cur_picked_from_list  \
+                = user_interface_data(cur_names, currencies_list)
+            if name_cur_picked == '':
+                print('Выход из приложения...')
+                break
+        except (ValueError, IndexError):
+            print('Ошибка, поробуйте еще раз!')
+            continue
+        else:
+            represents_results(name_cur_picked, cur_operation,
+                               cur_amount, cur_picked_value, num_cur_picked_from_list)
 
 
 if __name__ == '__main__':

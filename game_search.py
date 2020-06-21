@@ -1,9 +1,18 @@
 import requests
+from argparse import ArgumentParser
 
 
 def search_and_find_game():
     """Takes game and searches it"""
-    game_asked = input('Какая игра интересует? ').lower()
+    parser = ArgumentParser()
+    parser.add_argument(
+        '--game', help='Type the game price you want to find')
+    args = parser.parse_args()
+    if not args.game:
+        game_asked = input('Какая игра интересует? ').lower()
+    elif args.game:
+        game = args.game.lower().join('_')
+        game_asked = game
     url = 'http://www.plati.io/api/search.ashx?query=' + game_asked \
           + '&pagesize=100&response=json'
     r = requests.get(url)
