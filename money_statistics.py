@@ -28,36 +28,42 @@ def count_money_month_data(name):
 
 def get_complete_statistics(file):
     """Gets and parses statistics of all months"""
-    months_total_sums = []
-    months_total_names = []
-    with open(file) as f:
-        data = f.readlines()
+    if file == FILES[1]:
+        with open(file, encoding='utf-8') as f:
+            data = f.readlines()
+    elif file == FILES[0]:
+        with open(file) as f:
+            data = f.readlines()
+
     months_data = list(filter(lambda line: '#' in line, data))
-    for month in months_data:
-        month_split_data = month.split()
-        month_total_name = month_split_data[3]
-        month_total_rubs = month_split_data[4]
-        month_total_kops = month_split_data[6]
-        month_total_sum = f'{month_total_rubs}.{month_total_kops}'
-        months_total_names.append(month_total_name)
-        months_total_sums.append(float(month_total_sum))
+    months_split_data = list(map(lambda m: m.split(), months_data))
+
+    months_total_names = [month[3] for month in months_split_data]
+    months_total_sums = [
+        float(f'{month[4]}.{month[6]}') for month in months_split_data]
     months_names_sums = dict(zip(months_total_names, months_total_sums))
     return months_names_sums
 
 
-def creates_graph(data_dict):
+def creates_graph(data_dict, file):
     """Creates graph according to data_dict"""
-    months = list(data_dict.keys())
-    summs = list(data_dict.values())
     fig = plt.figure()
     ax = fig.add_subplot(111)
+    months = list(data_dict.keys())
+    summs = list(data_dict.values())
+    if file == FILES[1]:
+        ax.axhspan(5000, 9000, facecolor='#b9ed9f')
+        ax.axhspan(9001, 11000, facecolor='#f6f78d')
+        ax.axhspan(11001, 15000, facecolor='#ff776b')
+    elif file == FILES[0]:
+        ax.axhspan(11000, 16000, facecolor='#b9ed9f')
+        ax.axhspan(16001, 20000, facecolor='#f6f78d')
+        ax.axhspan(20001, max(summs) + 500, facecolor='#ff776b')
+    year = datetime.datetime.now().year
     ax.set_ylabel('Сумма руб')
-    ax.axhspan(11000, 16000, facecolor='#b9ed9f')
-    ax.axhspan(16001, 20000, facecolor='#f6f78d')
-    ax.axhspan(20001, max(summs) + 500, facecolor='#ff776b')
     ax.margins(0)
 
-    plt.title('Общие траты в:')
+    plt.title(f'Общие траты в {year} в:')
     plt.grid()
     ax.plot(months, summs, color='black', linewidth=2)
     fig.autofmt_xdate()
@@ -69,10 +75,8 @@ def write_data_to_file(sums, name):
     months = ['Январе', 'Феврале', 'Марте', 'Апреле', 'Мае', 'Июне', 'Июле',
               'Августе', 'Сентябре', 'Октябре', 'Ноябре', 'Декабре']
     total = round(sum(sums), 2)
-    total_rub = int(total // 1)
-    total_kop = int(round((total % 1) * 100))
-    rubs = get_rubles(total_rub)
-    kops = get_kops(total_kop)
+    total_rub, total_kop = int(total // 1), int(round((total % 1) * 100))
+    rubs, kops = get_rubles(total_rub), get_kops(total_kop)
     stat_month = datetime.datetime.now().month - 2
     month_to_write = months[stat_month]
     data = f'# Всего в {month_to_write}: {total_rub} {rubs}, {total_kop} {kops}\n'
@@ -84,6 +88,7 @@ def write_data_to_file(sums, name):
 
 def main():
     while True:
+        print()
         choice = input('''Что бы вы хотели посчитать: 1. общая сумма за месяц
                             2. общая сумма за месяц переведенная
                            > ''')
@@ -92,13 +97,17 @@ def main():
             name = FILES[0]
         elif choice == '2':
             name = FILES[1]
-        else:
+        elif choice == '':
+            print('Выход из программы...')
             break
+        else:
+            print('Неправильный ввод, попробуйте еще раз! Нажмите "ENTER" для выхода')
+            continue
         try:
             data = count_money_month_data(name)
-            # write_data_to_file(data, name)
+            write_data_to_file(data, name)
             data_in_dict = get_complete_statistics(name)
-            creates_graph(data_in_dict)
+            creates_graph(data_in_dict, name)
         except UnboundLocalError:
             print('Неправильный ввод!')
 
