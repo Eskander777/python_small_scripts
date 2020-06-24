@@ -1,8 +1,10 @@
 from rubs_kops_functions import *
 import matplotlib.pyplot as plt
+import os
 import datetime
 
-FILES = ['money_data\outcome_total.txt', 'money_data\outcome_sashka.txt']
+FILES = ['outcome_total.txt', 'outcome_sashka.txt']
+path = os.path.join(os.path.dirname(__file__), 'money_data')
 
 
 def count_money_month_data(name):
@@ -26,14 +28,14 @@ def count_money_month_data(name):
     return sums
 
 
-def get_complete_statistics(file):
+def get_complete_statistics(file_path, file_name):
     """Gets and parses statistics of all months"""
-    if file == FILES[1]:
-        with open(file, encoding='utf-8') as f:
-            data = f.readlines()
-    elif file == FILES[0]:
-        with open(file) as f:
-            data = f.readlines()
+    if file_name == FILES[1]:
+        with open(file_path, encoding='utf-8') as file:
+            data = file.readlines()
+    elif file_name == FILES[0]:
+        with open(file_path) as file:
+            data = file.readlines()
 
     months_data = list(filter(lambda line: '#' in line, data))
     months_split_data = list(map(lambda m: m.split(), months_data))
@@ -45,17 +47,17 @@ def get_complete_statistics(file):
     return months_names_sums
 
 
-def creates_graph(data_dict, file):
+def creates_graph(data_dict, file_name):
     """Creates graph according to data_dict"""
     fig = plt.figure()
     ax = fig.add_subplot(111)
     months = list(data_dict.keys())
     summs = list(data_dict.values())
-    if file == FILES[1]:
+    if file_name == FILES[1]:
         ax.axhspan(5000, 9000, facecolor='#b9ed9f')
         ax.axhspan(9001, 11000, facecolor='#f6f78d')
         ax.axhspan(11001, 15000, facecolor='#ff776b')
-    elif file == FILES[0]:
+    elif file_name == FILES[0]:
         ax.axhspan(11000, 16000, facecolor='#b9ed9f')
         ax.axhspan(16001, 20000, facecolor='#f6f78d')
         ax.axhspan(20001, max(summs) + 500, facecolor='#ff776b')
@@ -104,9 +106,10 @@ def main():
             print('Неправильный ввод, попробуйте еще раз! Нажмите "ENTER" для выхода')
             continue
         try:
-            data = count_money_month_data(name)
-            write_data_to_file(data, name)
-            data_in_dict = get_complete_statistics(name)
+            file_path = os.path.join(path, name)
+            data = count_money_month_data(file_path)
+            write_data_to_file(data, file_path)
+            data_in_dict = get_complete_statistics(file_path, name)
             creates_graph(data_in_dict, name)
         except UnboundLocalError:
             print('Неправильный ввод!')
