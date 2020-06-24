@@ -1,5 +1,6 @@
 import csv
 import sys
+import matplotlib.pyplot as plt
 from datetime import date
 from request_to_svdk import get_tarifs_from_svdk
 
@@ -114,6 +115,25 @@ def add_new_data_to_csv_file(month, h_w_k, c_w_k, h_w_b, c_w_b, h_w_spent,
         })
 
 
+def create_usage_graph(months_data):
+    """Creates graphs of usage cold and hot water"""
+    hot_water_used = {month['month']: int(month['hot_water_used_in_month'])
+                      for month in months_data}
+    cold_water_used = {month['month']: int(month['cold_water_used_in_month'])
+                       for month in months_data}
+
+    fig = plt.figure()
+    ax_hot_water = fig.add_subplot(211)
+    ax_cold_water = fig.add_subplot(212)
+    ax_hot_water.plot(hot_water_used.keys(), hot_water_used.values(), c="red")
+    ax_hot_water.margins(0)
+    ax_cold_water.plot(cold_water_used.keys(),
+                       cold_water_used.values(), c="blue")
+    ax_cold_water.margins(0)
+    fig.autofmt_xdate()
+    plt.show()
+
+
 def read_month(months):
     """Represented requested info from present CSV data file"""
     entered_months = [month['month'] for month in months]
@@ -164,14 +184,14 @@ def read_month(months):
                                   cold_water_total,
                                   month['cold_water_used_in_month'],
                                   month['hot_water_used_in_month'])
-                    )
+                          )
         break
 
 
 def main():
     while True:
         choice = input('''
-Чтобы вы хотели сделать:  1. Прочитать ранее внесенный данные
+Чтобы вы хотели сделать:  1. Прочитать ранее внесенные данные
                           2. Добавить новые данные
                           3. Выход
                           > ''')
@@ -179,6 +199,7 @@ def main():
         h_w_k_p, c_w_k_p, h_w_b_p, c_w_b_p, months = read_csv_file()
 
         if choice == '1':
+            create_usage_graph(months)
             read_month(months)
         elif choice == '2':
             try:
