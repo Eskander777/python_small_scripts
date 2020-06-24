@@ -125,11 +125,18 @@ def create_usage_graph(months_data):
     fig = plt.figure()
     ax_hot_water = fig.add_subplot(211)
     ax_cold_water = fig.add_subplot(212)
+
     ax_hot_water.plot(hot_water_used.keys(), hot_water_used.values(), c="red")
     ax_hot_water.margins(0)
+    ax_hot_water.grid(axis='both')
+    ax_hot_water.set_title('Горячая вода')
+
     ax_cold_water.plot(cold_water_used.keys(),
                        cold_water_used.values(), c="blue")
     ax_cold_water.margins(0)
+    ax_cold_water.grid(axis='both')
+    ax_cold_water.set_title('Холодная вода')
+
     fig.autofmt_xdate()
     plt.show()
 
@@ -189,19 +196,20 @@ def read_month(months):
 
 
 def main():
+    h_w_k_p, c_w_k_p, h_w_b_p, c_w_b_p, months = read_csv_file()
     while True:
         choice = input('''
 Чтобы вы хотели сделать:  1. Прочитать ранее внесенные данные
-                          2. Добавить новые данные
-                          3. Выход
+                          2. Показать график расхода воды
+                          3. Внести новые данные
+                          4. Выход
                           > ''')
 
-        h_w_k_p, c_w_k_p, h_w_b_p, c_w_b_p, months = read_csv_file()
-
         if choice == '1':
-            create_usage_graph(months)
             read_month(months)
         elif choice == '2':
+            create_usage_graph(months)
+        elif choice == '3':
             try:
                 month, h_w_k, c_w_k, h_w_b, c_w_b = gathering_info()
             except UnboundLocalError:
