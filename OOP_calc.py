@@ -41,16 +41,16 @@ class Calculator:
         res = self.first % other
         return res
 
-    def turn_to_int(self):
-        self.first = int(self.first)
+    def turn_to_num(self):
+        self.first = float(self.first)
 
     def make_calculations(self):
         try:
-            self.turn_to_int()
+            self.turn_to_num()
             oper_str = input('Enter operator: > ')
             if oper_str not in self.opers.keys():
                 raise ValueError
-            second_num = int(input('Enter second number: > '))
+            second_num = float(input('Enter second number: > '))
             oper = getattr(self, self.opers.get(oper_str))
             result = oper(second_num)
         except ZeroDivisionError:
