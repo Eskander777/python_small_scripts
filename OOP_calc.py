@@ -10,8 +10,8 @@ class Calculator:
 
     }
 
-    def __init__(self, first):
-        self.first = first
+    def __init__(self):
+        self.first = input('Enter first number (press "Enter" to exit): > ')
 
     def __add__(self, other):
         res = self.first + other
@@ -65,8 +65,7 @@ class Calculator:
 
 def main():
     while True:
-        calc = Calculator(
-            input('Enter first number (press "Enter" to exit): > '))
+        calc = Calculator()
         if calc.first == '':
             break
         try:
