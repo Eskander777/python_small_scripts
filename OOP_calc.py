@@ -24,32 +24,32 @@ class Calculator:
                 operation_tuple = self.expr.partition(separ)
                 self.first, self.oper_str, self.second = operation_tuple
 
-    def __add__(self, other):
-        res = self.first + other
+    def __add__(self):
+        res = self.first + self.second
         return res
 
-    def __sub__(self, other):
-        res = self.first - other
+    def __sub__(self):
+        res = self.first - self.second
         return res
 
-    def __mul__(self, other):
-        res = self.first * other
+    def __mul__(self):
+        res = self.first * self.second
         return res
 
-    def __truediv__(self, other):
-        res = self.first / other
+    def __truediv__(self):
+        res = self.first / self.second
         return res
 
-    def __pow__(self, other):
-        res = self.first ** other
+    def __pow__(self):
+        res = self.first ** self.second
         return res
 
-    def __floordiv__(self, other):
-        res = self.first // other
+    def __floordiv__(self):
+        res = self.first // self.second
         return res
 
-    def __mod__(self, other):
-        res = self.first % other
+    def __mod__(self):
+        res = self.first % self.second
         return res
 
     def turn_to_num(self):
@@ -64,7 +64,7 @@ class Calculator:
                 raise ValueError
             # second_num = float(input('Enter second number: > '))
             oper = getattr(self, self.opers.get(self.oper_str))
-            result = oper(self.second)
+            result = oper()
         except ZeroDivisionError:
             print("\nYou can't divide by zero. Try again!\n")
         except AttributeError:
