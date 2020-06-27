@@ -7,11 +7,22 @@ class Calculator:
         '**': '__pow__',
         '//': '__floordiv__',
         '%': '__mod__'
-
     }
 
     def __init__(self):
-        self.first = input('Enter first number (press "Enter" to exit): > ')
+        # self.first = input('Enter first number (press "Enter" to exit): > ')
+        self.expr = input(
+            'Enter operation you want to perform (example: "2 + 2" / press "ENTER" to quit): > ')
+        separ_array = []
+        separ = ''
+        if self.expr != '':
+            for sym in self.expr:
+                if sym in self.opers.keys():
+                    separ_array.append(sym)
+            separ = separ.join(separ_array)
+            if separ in self.opers.keys():
+                operation_tuple = self.expr.partition(separ)
+                self.first, self.oper_str, self.second = operation_tuple
 
     def __add__(self, other):
         res = self.first + other
@@ -43,30 +54,32 @@ class Calculator:
 
     def turn_to_num(self):
         self.first = float(self.first)
+        self.second = float(self.second)
 
     def make_calculations(self):
         try:
             self.turn_to_num()
-            oper_str = input('Enter operator: > ')
-            if oper_str not in self.opers.keys():
+            # oper_str = input('Enter operator: > ')
+            if self.oper_str not in self.opers.keys():
                 raise ValueError
-            second_num = float(input('Enter second number: > '))
-            oper = getattr(self, self.opers.get(oper_str))
-            result = oper(second_num)
+            # second_num = float(input('Enter second number: > '))
+            oper = getattr(self, self.opers.get(self.oper_str))
+            result = oper(self.second)
         except ZeroDivisionError:
             print("\nYou can't divide by zero. Try again!\n")
+        except AttributeError:
+            print('\nWrong input. Try again!\n')
         except (TypeError, ValueError):
             print('\nWrong input. Try again!\n')
-            raise
         else:
-            print(f'Operation: {self.first} {oper_str} {second_num}')
+            print(f'Operation: {self.first} {self.oper_str} {self.second}')
             print(f'\nThe answer is: {result}\n')
 
 
 def main():
     while True:
         calc = Calculator()
-        if calc.first == '':
+        if calc.expr == '':
             break
         try:
             calc.make_calculations()
