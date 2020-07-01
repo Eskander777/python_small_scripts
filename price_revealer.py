@@ -1,60 +1,71 @@
-from decimal import Decimal, DecimalException
+from decimal import Decimal, DecimalException, DivisionByZero
 import sys
 
 
-def reveal_true_price():
-    """Высчитывает настоящую цену продуктов"""
-    shop_price_str = input('Введите цену в магазине: ')
-    shop_amount_str = input('Введите количество грамм: ')
-    try:
-        one_gramm_cost = Decimal(shop_price_str) / Decimal(shop_amount_str)
-        ten_gramm_cost = round((one_gramm_cost * 10), 2)
-        fifty_gramm_cost = round((one_gramm_cost * 50), 2)
-        hundred_gramm_cost = round((one_gramm_cost * 100), 2)
-        return shop_price_str, shop_amount_str, one_gramm_cost, \
-            ten_gramm_cost, fifty_gramm_cost, hundred_gramm_cost
-    except (DecimalException, TypeError):
-        print('Неправильные данные!')
+class TruePrice:
+    def __init__(self, shop_price, shop_amount):
+        self.shop_price = shop_price
+        self.shop_amount = shop_amount
 
+    def reveal_true_price(self):
+        self.one_gramm_cost = self.shop_price / self.shop_amount
+        ten_gramm_cost = round((self.one_gramm_cost * 10), 2)
+        fifty_gramm_cost = round((self.one_gramm_cost * 50), 2)
+        hundred_gramm_cost = round((self.one_gramm_cost * 100), 2)
 
-def show_results(price, amount, one, ten, fifty, hundred):
-    """Выводит информацию о результатах"""
-    print('''В магазане за {} грамм просят {} руб. 
-    100 грамм стоит {} руб
-    50 грамм стоит {} руб
-    10 грамм стоит {} руб
-    1 грамм стоит {} руб'''.format(price, amount, hundred, fifty, ten,
-                                   round(one, 2)))
+        print(
+            f'\nВ магазине за {self.shop_price} грамм просят {self.shop_amount} руб.')
+        print(f'\t100 грамм стоит {hundred_gramm_cost} руб')
+        print(f'\t50 грамм стоит {fifty_gramm_cost} руб')
+        print(f'\t10 грамм стоит {ten_gramm_cost} руб')
 
-
-def calculate_gramms(one):
-    """Выводит сумму указанного количества грамм"""
-    gramms_interested_str = input(
-        'Цена какого количества грамм вас интересует: '
-    )
-    try:
-        result = Decimal(gramms_interested_str) * one
-        print('За {} грамм будет {} руб'.format(gramms_interested_str,
-                                                round(result, 2)))
-    except Exception:
-        print('Неправильно введены данные!')
+    def calculate_gramms(self):
+        """Выводит сумму указанного количества грамм"""
+        gramms_interested_str = input(
+            'Цена какого количества грамм вас интересует: '
+        )
+        try:
+            result = round((Decimal(gramms_interested_str)
+                            * self.one_gramm_cost), 2)
+            print(f'За {gramms_interested_str} грамм будет {result} руб.')
+        except:
+            print('Неправильно введены данные!')
 
 
 def main():
     """Основная операция"""
-    try:
-        price, amount, one, ten, fifty, hundred = reveal_true_price()
-    except Exception:
-        sys.exit()
-    else:
-        show_results(price, amount, one, ten, fifty, hundred)
-        print()
-        choice = input(
-            "Хотели бы вы узнать цену определенного количества грамм? "
-            "1 - да; 2 - нет: "
-        )
-        if choice == '1':
-            calculate_gramms(one)
+    while True:
+        try:
+            shop_price_str = input(
+                '\nВведите цену в магазине в рублях(нажмите "ENTER" чтобы выйти): > ').replace(',', '.')
+            if shop_price_str != '':
+                shop_price = Decimal(shop_price_str)
+            elif shop_price_str == '':
+                break
+            shop_amount_str = input(
+                'Введите количество грамм(нажмите "ENTER" чтобы выйти): > ').replace(',', '.')
+            if shop_amount_str != '':
+                shop_amount = Decimal(shop_amount_str)
+            elif shop_amount_str == '':
+                break
+            true_price = TruePrice(shop_price, shop_amount)
+            true_price.reveal_true_price()
+        except (DecimalException, DivisionByZero):
+            print('\nНеправильно внесены данные. Попробуйте еще раз.')
+        else:
+            choice = input(
+                '\nХотели бы вы узнать цену определенного количества грамм? "y"- да, "n"-нет: >  '
+            )
+            if choice == 'y':
+                true_price.calculate_gramms()
+                choice_continue = input(
+                    'Хотели бы продолжить? ("y"- да, "n"-нет): > ')
+                if choice_continue == 'y':
+                    continue
+                else:
+                    break
+            else:
+                break
 
 
 if __name__ == '__main__':
