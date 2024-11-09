@@ -262,10 +262,9 @@ def read_month(months):
                           )
 
                     try:
-                        dates, drink_water, canalization = get_tarifs_from_svdk()
-                        print()
                         print("Получение тарифов с сайта...")
                         print()
+                        dates, drink_water, canalization = get_tarifs_from_svdk()
                         print(
                             '''Актуальные тарифы на даты {}: 
                                 питьевая вода(холодная) - {} руб/куб, 
